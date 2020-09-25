@@ -1,0 +1,16 @@
+{
+    "_source": [
+        "ART_ID",
+        "DATE",
+        "TITLE",
+        "CNTS"
+    ],
+    "size": 10,
+    "from": 0,
+    "query": {
+        "multi_match": {
+            "query": "",
+            "fields": ["TITLE", "CNTS"]
+        }
+    }
+}
