@@ -2,13 +2,18 @@
 
 import os
 from flask import Flask, flash, render_template, request, redirect, jsonify, session, send_from_directory, make_response
+import pandas as pd
 import datetime
 import search
 import reco_v1
+import reco_v2
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
-#App.secret_key = 'by hcclab'
+
+#meta_path = "./data_econ.csv"
+#meta_data = pd.read_csv(meta_path, encoding='utf-8')
+
 
 def save_log(log):
 	with open('./log/time_eventlog', 'a') as f:
@@ -33,7 +38,10 @@ def ret():
     if (s is not None):
         result, total = search.issue(s)
         print('total', total)
-        print('result', result[0])
+        if len(result) > 0:
+            print('result', result[0])
+        else:
+            print('result is none')
         #pagination = {'current':p, "total":total//10, "max":total}
 
     else:
@@ -49,16 +57,17 @@ def ret():
 
 
 @app.route('/reco_v1', methods=['GET'])
-def recommend():
+def recommend_v1():
     cur = request.args.get("id")
-    #cur = int('1081592')
     print('current news item is...', cur)
 
     if (cur is not None):
         cur = int(cur)
-        top_sim_ids = reco_v1._get_sim_article(cur, topn=10)
-        print('top n', len(top_sim_ids))
-        print('most similar id is...', top_sim_ids[0])
+        top_sim_ids_v1 = reco_v1._get_sim_article(cur, topn=10)
+        #cur_meta = meta_data[meta_data['ART_ID'] == [cur]]
+        #print('metadata of current doc,' , cur_meta)
+        print('top n', len(top_sim_ids_v1))
+        print('most similar id (v1) is...', top_sim_ids_v1)
         #pagination = {'current':p, "total":total//10, "max":total}
 
     else:
@@ -69,23 +78,33 @@ def recommend():
     #    return make_response(render_template('no_res.html'))
         #result, total = search.issue(s,page=p,product=product,sort=sort,ctgr=rctgr,op='or')
         
-    response = make_response(render_template('reco_v1.html', query_id=cur, result=top_sim_ids))
+    response = make_response(render_template('reco_base.html', query_id=cur, result=top_sim_ids_v1))
     return response
 
-#@app.route('/result', methods=['POST'])
-#def result():
-#    query = request.form.get('query_')
-#    total = request.form.get('total_')
-#    result = request.form.get('result_')
-    #result = result.split(',')
 
-#    response = make_response(render_template('result.html', query=query, result=result, total=total))
-#    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-#    response.headers['Pragma'] = 'no-cache'
-#    print('response made', query)
-    #return render_template('page2.html', nut=nut,name=name,pct=pct)
+@app.route('/reco_v2', methods=['GET'])
+def recommend_v2():
+    cur = request.args.get("id")
+    print('current news item is...', cur)
 
-#    return response
+    if (cur is not None):
+        cur = int(cur)
+        top_sim_ids_v2 = reco_v2._get_sim_article(cur, topn=10)
+        print('top n', len(top_sim_ids_v2))
+        print('most similar id (v2) is...', top_sim_ids_v2)
+        #pagination = {'current':p, "total":total//10, "max":total}
+
+    else:
+        print("No query id was given...!")
+        return make_response(render_template('index.html'))
+
+    #if total == 0: 
+    #    return make_response(render_template('no_res.html'))
+        #result, total = search.issue(s,page=p,product=product,sort=sort,ctgr=rctgr,op='or')
+        
+    response = make_response(render_template('reco_base.html', query_id=cur, result=top_sim_ids_v2))
+    return response
+
 
 @app.route('/static/js/reco.js')
 def add_js_header1():
