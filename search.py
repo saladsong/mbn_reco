@@ -1,7 +1,7 @@
 from elasticsearch import Elasticsearch
 import json
 
-def issue(s='콜라', page=1):
+def issue(s='부동산', page=1):
     if page == None or "":
         doc_from, doc_to = 0, 10
     else:
@@ -21,7 +21,7 @@ def issue(s='콜라', page=1):
     #    query.update({"sort":[{"Registered date": {"order": "desc"}}]})
 
     #response = es_client.search(index="issue-v0.1.4",body=body)
-    response = es_client.search(index="mbn_econ", body=query)
+    response = es_client.search(index="mbn_labeld", body=query)
     hits = response['hits']['hits']
     total = response['hits']['total']['value']
 
