@@ -28,7 +28,7 @@ def update_simsco(sim_scores, datediff):
 
 
 def _get_sim_article(query_id, topn):
-    with open('./base_lab_cossim.pkl', mode='rb') as f0:
+    with open('./base_tfidf_cossim.pkl', mode='rb') as f0:
         cos_sim = pickle.load(f0)
 
     with open('./base_datelist_l.pkl', mode='rb') as f1:
