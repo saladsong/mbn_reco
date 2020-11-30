@@ -5,8 +5,7 @@ from flask import Flask, flash, render_template, request, redirect, jsonify, ses
 import pandas as pd
 import datetime
 import search
-import reco_v1
-import reco_v2
+import reco_v11, reco_v12, reco_v2, reco_v3
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -63,11 +62,11 @@ def recommend_v1():
 
     if (cur is not None):
         cur = int(cur)
-        top_sim_ids_v1 = reco_v1._get_sim_article(cur, topn=10)
+        top_sim_ids = reco_v3._get_sim_article(cur, topn=10, model='lda')
         #cur_meta = meta_data[meta_data['ART_ID'] == [cur]]
         #print('metadata of current doc,' , cur_meta)
-        print('top n', len(top_sim_ids_v1))
-        print('most similar id (v1) is...', top_sim_ids_v1)
+        print('top n', len(top_sim_ids))
+        print('most similar id (v33) is...', top_sim_ids)
         #pagination = {'current':p, "total":total//10, "max":total}
 
     else:
@@ -78,40 +77,14 @@ def recommend_v1():
     #    return make_response(render_template('no_res.html'))
         #result, total = search.issue(s,page=p,product=product,sort=sort,ctgr=rctgr,op='or')
         
-    response = make_response(render_template('reco_base.html', query_id=cur, result=top_sim_ids_v1))
+    response = make_response(render_template('reco_base.html', query_id=cur, result=top_sim_ids))
     return response
-
-
-@app.route('/reco_v2', methods=['GET'])
-def recommend_v2():
-    cur = request.args.get("id")
-    print('current news item is...', cur)
-
-    if (cur is not None):
-        cur = int(cur)
-        top_sim_ids_v2 = reco_v2._get_sim_article(cur, topn=10)
-        print('top n', len(top_sim_ids_v2))
-        print('most similar id (v2) is...', top_sim_ids_v2)
-        #pagination = {'current':p, "total":total//10, "max":total}
-
-    else:
-        print("No query id was given...!")
-        return make_response(render_template('index.html'))
-
-    #if total == 0: 
-    #    return make_response(render_template('no_res.html'))
-        #result, total = search.issue(s,page=p,product=product,sort=sort,ctgr=rctgr,op='or')
-        
-    response = make_response(render_template('reco_base.html', query_id=cur, result=top_sim_ids_v2))
-    return response
-
 
 @app.route('/static/js/reco.js')
 def add_js_header1():
 	response = send_from_directory(app.static_folder, 'js/reco.js')
 	response.headers['X-XSS-Protection'] = "1"
 	return response
-
 
 #@app.route('/issueView', methods=['GET'])
 #def issueView():
